@@ -1,6 +1,5 @@
 import {
   createBrowserRouter,
-  // HashRouter,
   Navigate,
   Outlet,
   RouterProvider,
@@ -75,9 +74,7 @@ function App() {
   ]);
   return (
     <div>
-      {/* <HashRouter basename="/Facebook"> */}
       <RouterProvider router={router} />
-      {/* </HashRouter> */}
     </div>
   );
 }
