@@ -63,6 +63,7 @@ function App() {
         },
       ],
     },
+
     {
       path: "/login",
       element: <Login />,
@@ -71,10 +72,16 @@ function App() {
       path: "/register",
       element: <Register />,
     },
+    // { basename: import.meta.env.DEV ? "/" : "/Facebook" },
   ]);
+
   return (
     <div>
+      {/* <BrowserRouter basename="/Facebook"> */}
+      {/* <Routes> */}
       <RouterProvider router={router} />
+      {/* </Routes> */}
+      {/* </BrowserRouter> */}
     </div>
   );
 }
