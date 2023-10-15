@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/Facebook/static/css/main.07dea178.css",
+    "main.js": "/Facebook/static/js/main.f91b9f2a.js",
+    "static/media/marketplace.png": "/Facebook/static/media/marketplace.b70f466190fc2c28a997.png",
+    "static/media/friend.png": "/Facebook/static/media/friend.f858ee173ffd0eb033cb.png",
+    "static/media/messages.png": "/Facebook/static/media/messages.ba3c9dc707046fdd4aeb.png",
+    "static/media/memories.png": "/Facebook/static/media/memories.7543dcd9cd8593f28bf3.png",
+    "static/media/watch.png": "/Facebook/static/media/watch.1ce5dc932fd6a4a8d666.png",
+    "index.html": "/Facebook/index.html",
+    "main.07dea178.css.map": "/Facebook/static/css/main.07dea178.css.map",
+    "main.f91b9f2a.js.map": "/Facebook/static/js/main.f91b9f2a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.07dea178.css",
+    "static/js/main.f91b9f2a.js"
+  ]
+}
