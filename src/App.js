@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
   Navigate,
   Outlet,
   RouterProvider,
@@ -44,7 +44,7 @@ function App() {
     return children;
   };
 
-  const router = createBrowserRouter([
+  const router = createHashRouter([
     {
       path: "/",
       element: (
@@ -72,16 +72,12 @@ function App() {
       path: "/register",
       element: <Register />,
     },
-    // { basename: import.meta.env.DEV ? "/" : "/Facebook" },
+    // { basename: "/Facebook" },
   ]);
 
   return (
     <div>
-      {/* <BrowserRouter basename="/Facebook"> */}
-      {/* <Routes> */}
       <RouterProvider router={router} />
-      {/* </Routes> */}
-      {/* </BrowserRouter> */}
     </div>
   );
 }

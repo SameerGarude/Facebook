@@ -26,7 +26,7 @@ const Share = () => {
             <label htmlFor="file">
               <div className="item">
                 <img src={photos} alt="" />
-                <span>Photo/Video</span>
+                <span>Photo /Video</span>
               </div>
             </label>
 
@@ -37,7 +37,7 @@ const Share = () => {
 
             <div className="item">
               <img src={feeling} alt="" />
-              <span>Feeling/Activity</span>
+              <span>Feeling/ Activity</span>
             </div>
           </div>
           <div className="right">

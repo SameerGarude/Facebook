@@ -12,7 +12,7 @@
     top: 0;
     background-color: themed("bg");
     color: themed("textColor");
-    z-index: 1;
+    z-index: 999;
 
     .left {
       display: flex;
@@ -75,9 +75,6 @@
           height: 30px;
           border-radius: 50%;
           object-fit: cover;
-        }
-
-        span {
         }
       }
     }
