@@ -1,5 +1,5 @@
 import "./navBar.scss";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { AuthContext } from "../../context/authContext";
@@ -15,6 +15,8 @@ import {
 } from "@mui/icons-material";
 
 const NavBar = () => {
+  const userId = parseInt(useLocation().pathname.split("/")[2]);
+
   const { toggle, darkMode } = useContext(DarkModeContext);
 
   const { currentUser } = useContext(AuthContext);
@@ -43,13 +45,8 @@ const NavBar = () => {
         <EmailOutlined />
         <NotificationsOutlined />
         <div className="user">
-          <img src={currentUser.profilePic} alt="" />
-          <Link
-            to="/profile/:id"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            <span>{currentUser.name}</span>
-          </Link>
+          <img src={"/upload/" + currentUser.profilePic} alt="" />
+          <span>{currentUser.name}</span>
         </div>
       </div>
     </div>

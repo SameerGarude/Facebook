@@ -1,3 +1,4 @@
+import "./post.scss";
 import {
   FavoriteBorderOutlined,
   FavoriteOutlined,
@@ -5,22 +6,67 @@ import {
   ShareOutlined,
   TextsmsOutlined,
 } from "@mui/icons-material";
-import "./post.scss";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import moment from "moment";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+import { AuthContext } from "../../context/authContext";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
-  //temporary
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const liked = false;
+  const { currentUser } = useContext(AuthContext);
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["likes", post.id],
+    queryFn: () =>
+      makeRequest.get("/likes?postId=" + post.id).then(res => {
+        return res.data;
+      }),
+  });
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: liked => {
+      if (liked) return makeRequest.delete("/likes?postId=" + post.id);
+      return makeRequest.post("/likes", { postId: post.id });
+    },
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["likes"]);
+    },
+  });
+
+  const handleLike = () => {
+    mutation.mutate(data.includes(currentUser.id));
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: postId => {
+      return makeRequest.delete("/posts/" + postId);
+    },
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["posts"]);
+    },
+  });
+
+  const handleDelete = () => {
+    deleteMutation.mutate(post.id);
+  };
+
   return (
     <div className="post">
       <div className="container">
         <div className="user">
           <div className="userInfo">
-            <img src={post.profilePic} alt="" />
+            <img src={"/upload/" + post.profilePic} alt="" />
             <div className="details">
               <Link
                 to={`/profile/${post.userId}`}
@@ -28,29 +74,39 @@ const Post = ({ post }) => {
               >
                 <span className="name">{post.name}</span>
               </Link>
-              <span className="date">a few seconds ago</span>
+              <span className="date">{moment(post.createdAt).fromNow()}</span>
             </div>
           </div>
-          <MoreHoriz />
+          <MoreHoriz onClick={() => setMenuOpen(!menuOpen)} />
+          {menuOpen && post.userId === currentUser.id && (
+            <button onClick={handleDelete}>Delete</button>
+          )}
         </div>
         <div className="content">
           <p>{post.desc}</p>
-          <img src={post.img} alt="" />
+          <img src={"./upload/" + post.img} alt="" />
         </div>
         <div className="info">
           <div className="item">
-            {liked ? <FavoriteOutlined /> : <FavoriteBorderOutlined />}
-            12 Likes
+            {isLoading ? (
+              "loading likes"
+            ) : data.includes(currentUser.id) ? (
+              <FavoriteOutlined style={{ color: "red" }} onClick={handleLike} />
+            ) : (
+              <FavoriteBorderOutlined onClick={handleLike} />
+            )}
+            {data?.length} Likes
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
-            <TextsmsOutlined />6 Comments
+            <TextsmsOutlined />
+            See Comments
           </div>
           <div className="item">
             <ShareOutlined />
             Share
           </div>
         </div>
-        {commentOpen && <Comments />}
+        {commentOpen && <Comments postId={post?.id} />}
       </div>
     </div>
   );

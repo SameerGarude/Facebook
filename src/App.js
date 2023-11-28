@@ -1,12 +1,12 @@
+import Login from "./pages/login/Login";
+import Register from "./pages/register/Register";
 import {
-  createHashRouter,
+  createBrowserRouter,
   Navigate,
   Outlet,
   RouterProvider,
 } from "react-router-dom";
 import "./style.scss";
-import Login from "./pages/login/Login";
-import Register from "./pages/register/Register";
 import NavBar from "./components/navbar/NavBar";
 import LeftBar from "./components/leftBar/LeftBar";
 import RightBar from "./components/rightBar/RightBar";
@@ -15,24 +15,29 @@ import Profile from "./pages/profile/Profile";
 import { useContext } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
 
   const { darkMode } = useContext(DarkModeContext);
 
+  const queryClient = new QueryClient();
+
   const Layout = () => {
     return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <NavBar />
-        <div style={{ display: "flex" }}>
-          <LeftBar />
-          <div style={{ flex: 7 }}>
-            <Outlet />
+      <QueryClientProvider client={queryClient}>
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+          <NavBar />
+          <div style={{ display: "flex" }}>
+            <LeftBar />
+            <div style={{ flex: 6 }}>
+              <Outlet />
+            </div>
+            <RightBar />
           </div>
-          <RightBar />
         </div>
-      </div>
+      </QueryClientProvider>
     );
   };
 
@@ -44,7 +49,7 @@ function App() {
     return children;
   };
 
-  const router = createHashRouter([
+  const router = createBrowserRouter([
     {
       path: "/",
       element: (
@@ -72,7 +77,6 @@ function App() {
       path: "/register",
       element: <Register />,
     },
-    // { basename: "/Facebook" },
   ]);
 
   return (
@@ -84,5 +88,5 @@ function App() {
 
 export default App;
 
-// cd PROJECTS\React-Projects\facebook
+// cd PROJECTS\React-Projects\social\api
 // outlet is used for swith between home and profile page

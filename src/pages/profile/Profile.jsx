@@ -11,65 +11,129 @@ import {
 } from "@mui/icons-material";
 import "./profile.scss";
 import Posts from "../../components/posts/Posts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+import { useLocation } from "react-router-dom";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/authContext";
+import Update from "../../components/update/Update";
 
 const Profile = () => {
+  const [openUpdate, setOpenUpdate] = useState(false);
+
+  const { currentUser } = useContext(AuthContext);
+
+  const userId = parseInt(useLocation().pathname.split("/")[2]);
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["user"],
+    queryFn: () =>
+      makeRequest.get("/users/find/" + userId).then(res => {
+        return res.data;
+      }),
+  });
+
+  const {
+    isLoading: rIsLoading,
+
+    data: relationshipData,
+  } = useQuery({
+    queryKey: ["relationship"],
+    queryFn: () =>
+      makeRequest.get("/relationships?followedUserId=" + userId).then(res => {
+        return res.data;
+      }),
+  });
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: following => {
+      if (following)
+        return makeRequest.delete("/relationships?userId=" + userId);
+      return makeRequest.post("/relationships", { userId });
+    },
+
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries(["relationship"]);
+    },
+  });
+
+  const handleFollow = () => {
+    mutation.mutate(relationshipData.includes(currentUser.id));
+  };
+
   return (
     <div className="profile">
-      <div className="images">
-        <img
-          src="https://images.pexels.com/photos/13440765/pexels-photo-13440765.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          alt=""
-          className="cover"
-        />
-        <img
-          src="https://images.pexels.com/photos/14028501/pexels-photo-14028501.jpeg?auto=compress&cs=tinysrgb&w=1600&lazy=load"
-          alt=""
-          className="profilePic"
-        />
-      </div>
-      <div className="profileContainer">
-        <div className="uInfo">
-          <div className="left">
-            <a href="http://facebook.com">
-              <FacebookTwoTone />
-            </a>
-            <a href="http://instagram.com">
-              <Instagram />
-            </a>
-            <a href="http://twitter.com">
-              <Twitter />
-            </a>
-            <a href="http://linkedin.com">
-              <LinkedIn />
-            </a>
-            <a href="http://pinterest.com">
-              <Pinterest />
-            </a>
+      {isLoading ? (
+        "Loading profile"
+      ) : (
+        <>
+          <div className="images">
+            <img src={"/upload/" + data.coverPic} alt="" className="cover" />
+            <img
+              src={"/upload/" + data.profilePic}
+              alt=""
+              className="profilePic"
+            />
           </div>
-
-          <div className="center">
-            <span>Joe Root</span>
-            <div className="info">
-              <div className="item">
-                <Place />
-                <span>IND</span>
+          <div className="profileContainer">
+            <div className="uInfo">
+              <div className="left">
+                <a href="http://facebook.com">
+                  <FacebookTwoTone />
+                </a>
+                <a href="http://instagram.com">
+                  <Instagram />
+                </a>
+                <a href="http://twitter.com">
+                  <Twitter />
+                </a>
+                <a href="http://linkedin.com">
+                  <LinkedIn />
+                </a>
+                <a href="http://pinterest.com">
+                  <Pinterest />
+                </a>
               </div>
-              <div className="item">
-                <Language />
-                <span>sammy.dev</span>
+
+              <div className="center">
+                <span>{data?.name}</span>
+                <div className="info">
+                  <div className="item">
+                    <Place />
+                    <span>{data?.city}</span>
+                  </div>
+                  <div className="item">
+                    <Language />
+                    <span>{data?.website}</span>
+                  </div>
+                </div>
+                {rIsLoading ? (
+                  "Loading relationship"
+                ) : userId === currentUser.id ? (
+                  <button onClick={() => setOpenUpdate(true)}>Update</button>
+                ) : (
+                  <button onClick={handleFollow}>
+                    {relationshipData?.includes(currentUser.id)
+                      ? "Following"
+                      : "Follow"}
+                  </button>
+                )}
+              </div>
+
+              <div className="right">
+                <EmailOutlined />
+                <MoreVert />
               </div>
             </div>
-            <button>Follow</button>
-          </div>
 
-          <div className="right">
-            <EmailOutlined />
-            <MoreVert />
+            <Posts userId={userId} />
           </div>
-        </div>
-
-        <Posts />
-      </div>
+        </>
+      )}
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data} />}
     </div>
   );
 };
